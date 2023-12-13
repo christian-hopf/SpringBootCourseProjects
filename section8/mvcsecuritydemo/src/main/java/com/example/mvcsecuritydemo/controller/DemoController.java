@@ -15,4 +15,9 @@ public class DemoController {
     public String showLeadersPage() {
         return "leaders";
     }
+
+    @GetMapping("/systems")
+    public String showSystemsPage() {
+        return "systems";
+    }
 }

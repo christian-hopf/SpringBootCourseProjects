@@ -18,9 +18,19 @@
 <hr>
 
 <!-- link to /leaders (manager role only) -->
-<p>
-    <a th:href="@{/leaders}">Leaders Page</a>
-</p>
+<div sec:authorize="hasRole('MANAGER')">
+    <p>
+        <a th:href="@{/leaders}">Leaders Page</a>
+    </p>
+</div>
+
+<!-- link to systems (admin role only) -->
+<div sec:authorize="hasRole('ADMIN')">
+    <p>
+        <a th:href="@{/systems}">Leaders Page</a>
+    </p>
+</div>
+
 
 <form action="#" th:action="@{logout}" method="POST">
     <input type="submit" value="Log out"/>

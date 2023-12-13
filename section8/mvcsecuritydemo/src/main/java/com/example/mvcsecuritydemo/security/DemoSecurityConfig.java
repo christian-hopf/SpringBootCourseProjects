@@ -6,28 +6,44 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+import javax.sql.DataSource;
 
 @Configuration
 public class DemoSecurityConfig {
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsManager() {
+//        UserDetails user = User.builder()
+//                .username("user")
+//                .password("{noop}password")
+//                .roles("EMPLOYEE")
+//                .build();
+//        UserDetails manager = User.builder()
+//                .username("manager")
+//                .password("{noop}password")
+//                .roles("EMPLOYEE", "MANAGER")
+//                .build();
+//        UserDetails admin = User.builder()
+//                .username("admin")
+//                .password("{noop}password")
+//                .roles("EMPLOYEE", "MANAGER", "ADMIN")
+//                .build();
+//        return new InMemoryUserDetailsManager(user, manager, admin);
+//    }
+
     @Bean
-    public InMemoryUserDetailsManager userDetailsManager() {
-        UserDetails user = User.builder()
-                .username("user")
-                .password("{noop}password")
-                .roles("EMPLOYEE")
-                .build();
-        UserDetails manager = User.builder()
-                .username("manager")
-                .password("{noop}password")
-                .roles("EMPLOYEE", "MANAGER")
-                .build();
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password("{noop}password")
-                .roles("EMPLOYEE", "MANAGER", "ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(user, manager, admin);
+    public UserDetailsManager userDetailsManager(DataSource dataSource) {
+        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+        jdbcUserDetailsManager.setUsersByUsernameQuery(
+                "select user_id, pw, active from members where user_id=?"
+        );
+        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(
+                "select user_id, role from roles where user_id=?"
+        );
+        return jdbcUserDetailsManager;
     }
 
     @Bean
@@ -42,7 +58,10 @@ public class DemoSecurityConfig {
                                 .loginProcessingUrl("/authenticateTheUser")
                                 .permitAll()
                 )
-                .logout(logout -> logout.permitAll());
+                .logout(logout -> logout.permitAll())
+                .exceptionHandling(configurer ->
+                        configurer.accessDeniedPage("/access-denied")
+                );
         return http.build();
     }
 
