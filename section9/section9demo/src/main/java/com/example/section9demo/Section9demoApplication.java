@@ -1,10 +1,7 @@
 package com.example.section9demo;
 
 import com.example.section9demo.dao.AppDAO;
-import com.example.section9demo.entity.Course;
-import com.example.section9demo.entity.Instructor;
-import com.example.section9demo.entity.InstructorDetail;
-import com.example.section9demo.entity.Review;
+import com.example.section9demo.entity.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -37,7 +34,12 @@ public class Section9demoApplication {
 //            deleteCourse(dao);
 //            createCourseWithReviews(dao);
 //            findCourseAndReviews(dao);
-            deleteCourseAndReviews(dao);
+//            deleteCourseAndReviews(dao);
+//            createCourseWithStudents(dao);
+//            findCourseAndStudents(dao);
+//            findStudentAndCourses(dao);
+//            updateStudent(dao);
+            deleteStudent(dao);
         };
     }
 
@@ -171,6 +173,55 @@ public class Section9demoApplication {
         System.out.println("Deleting course and reviews with id " + id);
         dao.deleteCourseById(id);
         System.out.println("Deleted course with id " + id);
+    }
+
+    private void createCourseWithStudents(AppDAO dao) {
+        Course course1 = new Course("Firearm Safety");
+        Student student1 = new Student("A", "B", "e@email.com");
+        Student student2 = new Student("C", "D", "e@email.com");
+        Student student3 = new Student("E", "F", "e@email.com");
+        course1.addStudent(student1);
+        course1.addStudent(student2);
+        course1.addStudent(student3);
+        System.out.println("Saving course: " + course1);
+        System.out.println("Associated students: " + course1.getStudents());
+        dao.save(course1);
+        System.out.println("Course saved");
+    }
+
+    private void findCourseAndStudents(AppDAO dao) {
+        int id = 10;
+        System.out.println("Finding course and associated students with course id " + id);
+        Course course = dao.findCourseAndStudentsByCourseId(id);
+        System.out.println("Course: " + course);
+        System.out.println("Students: " + course.getStudents());
+    }
+
+    private void findStudentAndCourses(AppDAO dao) {
+        int id = 1;
+        System.out.println("Finding student and associated courses with student id " + id);
+        Student student = dao.findStudentAndCoursesByStudentId(id);
+        System.out.println("Student: " + student);
+        System.out.println("Courses: " + student.getCourses());
+    }
+
+    private void updateStudent(AppDAO dao) {
+        int id = 3;
+        Student student = dao.findStudentAndCoursesByStudentId(3);
+        System.out.println("Adding courses to student with id " + id);
+        Course course1 = new Course("Java");
+        Course course2 = new Course("Baking");
+        student.addCourse(course1);
+        student.addCourse(course2);
+        dao.update(student);
+        System.out.println("Updated student with id " + id);
+    }
+
+    private void deleteStudent(AppDAO dao) {
+        int id = 1;
+        System.out.println("Deleting student with id " + id);
+        dao.deleteStudentById(id);
+        System.out.println("Deleted student with id " + id);
     }
 
 }

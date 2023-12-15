@@ -3,6 +3,7 @@ package com.example.section9demo.dao;
 import com.example.section9demo.entity.Course;
 import com.example.section9demo.entity.Instructor;
 import com.example.section9demo.entity.InstructorDetail;
+import com.example.section9demo.entity.Student;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,24 @@ public class AppDAOImpl implements AppDAO {
     }
 
     @Override
+    public Course findCourseAndStudentsByCourseId(int id) {
+        TypedQuery<Course> query = entityManager.createQuery("select c from Course c "
+                + "JOIN FETCH c.students "
+                + "where c.id = :data", Course.class);
+        query.setParameter("data", id);
+        return query.getSingleResult();
+    }
+
+    @Override
+    public Student findStudentAndCoursesByStudentId(int id) {
+        TypedQuery<Student> query = entityManager.createQuery("select s from Student s "
+                + "JOIN FETCH s.courses "
+                + "where s.id = :data", Student.class);
+        query.setParameter("data", id);
+        return query.getSingleResult();
+    }
+
+    @Override
     @Transactional
     public void update(Instructor instructor) {
         entityManager.merge(instructor);
@@ -81,6 +100,12 @@ public class AppDAOImpl implements AppDAO {
     @Transactional
     public void update(Course course) {
         entityManager.merge(course);
+    }
+
+    @Override
+    @Transactional
+    public void update(Student student) {
+        entityManager.merge(student);
     }
 
     @Override
@@ -110,6 +135,13 @@ public class AppDAOImpl implements AppDAO {
     public void deleteCourseById(int id) {
         Course course = entityManager.find(Course.class, id);
         entityManager.remove(course);
+    }
+
+    @Override
+    @Transactional
+    public void deleteStudentById(int id) {
+        Student student = entityManager.find(Student.class, id);
+        entityManager.remove(student);
     }
 
 }
